@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Feliz Aniversário 🎂</title>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
+}
+
+body{
+height:100vh;
+overflow:hidden;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(180deg,#020111,#071330,#111c4a,#020111);
+position:relative;
+}
+
+/* ESTRELAS */
+
+.stars{
+position:absolute;
+width:100%;
+height:100%;
+overflow:hidden;
+}
+
+.star{
+position:absolute;
+background:white;
+border-radius:50%;
+animation:piscar 2s infinite alternate;
+}
+
+@keyframes piscar{
+from{opacity:.2;}
+to{opacity:1;}
+}
+
+.shooting{
+position:absolute;
+width:2px;
+height:80px;
+background:linear-gradient(white,transparent);
+transform:rotate(45deg);
+animation:shoot 7s linear infinite;
+opacity:.7;
+}
+
+@keyframes shoot{
+
+0%{
+top:-10%;
+left:-10%;
+opacity:0;
+}
+
+5%{
+opacity:1;
+}
+
+20%{
+top:120%;
+left:120%;
+opacity:0;
+}
+
+100%{
+top:120%;
+left:120%;
+opacity:0;
+}
+
+}
+
+/* CARD */
+
+.card{
+
+position:relative;
+z-index:10;
+
+width:min(92%,700px);
+
+padding:40px;
+
+background:rgba(255,255,255,.08);
+
+backdrop-filter:blur(12px);
+
+border:1px solid rgba(255,255,255,.15);
+
+border-radius:25px;
+
+text-align:center;
+
+color:white;
+
+box-shadow:0 0 40px rgba(0,0,0,.45);
+
+}
+
+h1{
+
+font-size:3rem;
+
+margin-bottom:20px;
+
+}
+
+#typing{
+
+font-size:1.25rem;
+
+line-height:1.7;
+
+min-height:120px;
+
+}
+
+blockquote{
+
+margin:30px 0;
+
+padding:20px;
+
+background:rgba(255,255,255,.08);
+
+border-left:4px solid gold;
+
+font-style:italic;
+
+border-radius:12px;
+
+line-height:1.7;
+
+}
+
+blockquote footer{
+
+margin-top:10px;
+
+font-weight:bold;
+
+}
+
+button{
+
+margin-top:20px;
+
+padding:18px 40px;
+
+font-size:18px;
+
+border:none;
+
+border-radius:50px;
+
+background:#ffd54f;
+
+color:#222;
+
+font-weight:bold;
+
+cursor:pointer;
+
+animation:pulse 2s infinite;
+
+transition:.3s;
+
+}
+
+button:hover{
+
+transform:scale(1.08);
+
+}
+
+@keyframes pulse{
+
+0%{
+
+transform:scale(1);
+
+}
+
+50%{
+
+transform:scale(1.06);
+
+}
+
+100%{
+
+transform:scale(1);
+
+}
+
+}
+
+.emoji{
+
+font-size:55px;
+
+margin-bottom:15px;
+
+animation:flutuar 3s ease-in-out infinite;
+
+}
+
+@keyframes flutuar{
+
+0%,100%{
+
+transform:translateY(0);
+
+}
+
+50%{
+
+transform:translateY(-10px);
+
+}
+
+}
+
+@media(max-width:700px){
+
+body{
+
+overflow:auto;
+
+padding:20px;
+
+}
+
+h1{
+
+font-size:2.1rem;
+
+}
+
+#typing{
+
+font-size:1rem;
+
+}
+
+.card{
+
+padding:25px;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+<audio id="bgMusic" autoplay loop>
+    <source src="videoplayback.m4a" type="audio/mpeg">
+    Seu navegador não suporta áudio.
+</audio>
+
+<div class="stars" id="stars"></div>
+
+<div class="shooting"></div>
+
+<div class="card">
+
+<div class="emoji">🎂✨</div>
+
+<h1>Feliz Aniversário!</h1>
+
+<p id="typing"></p>
+
+<blockquote>
+
+"Em algum lugar, algo incrível está esperando para ser descoberto."
+
+<footer>— Carl Sagan</footer>
+
+</blockquote>
+
+<button onclick="explodir()">
+
+🎉 Comemorar
+
+</button>
+
+</div>
+
+<script>
+
+// cria estrelas
+
+const estrelas=document.getElementById("stars");
+const music = document.getElementById("bgMusic");
+
+function iniciarMusica() {
+    // Começa praticamente inaudível
+    music.volume = 0.01;
+
+    music.play().then(() => {
+        let volume = 0.01;
+
+        const fade = setInterval(() => {
+            if (volume < 0.4) { // Volume final (40%)
+                volume += 0.01;
+                music.volume = volume;
+            } else {
+                clearInterval(fade);
+            }
+        }, 200); // Aumenta a cada 200 ms
+    }).catch(err => {
+        console.log("Não foi possível iniciar a música:", err);
+    });
+}
+for(let i=0;i<180;i++){
+
+let s=document.createElement("div");
+
+s.className="star";
+
+let tamanho=Math.random()*3+1;
+
+s.style.width=tamanho+"px";
+
+s.style.height=tamanho+"px";
+
+s.style.left=Math.random()*100+"%";
+
+s.style.top=Math.random()*100+"%";
+
+s.style.animationDelay=Math.random()*3+"s";
+
+estrelas.appendChild(s);
+
+}
+
+// texto digitando
+
+const texto="Hoje celebramos algo raro e extraordinário: a sua existência. Em meio à imensidão do universo, cada ano vivido representa novas descobertas, novos sonhos e novas histórias. Que este novo ciclo seja repleto de felicidade, saúde, conquistas e momentos inesquecíveis. Continue olhando para o futuro com curiosidade, esperança e coragem. O universo ainda guarda inúmeras maravilhas esperando por você. Feliz Aniversário! 🎂✨";
+
+let i=0;
+
+function escrever(){
+
+if(i<texto.length){
+
+document.getElementById("typing").innerHTML+=texto.charAt(i);
+
+i++;
+
+setTimeout(escrever,28);
+
+}
+
+}
+
+escrever();
+
+// confetes
+
+function explodir(){
+
+confetti({
+
+particleCount:300,
+
+spread:180,
+
+origin:{y:.6}
+
+});
+
+}
+
+// automático
+
+window.onload=()=>{
+
+explodir();
+
+let fim=Date.now()+7000;
+
+(function frame(){
+
+confetti({
+
+particleCount:4,
+
+angle:60,
+
+spread:55,
+
+origin:{x:0}
+
+});
+
+confetti({
+
+particleCount:4,
+
+angle:120,
+
+spread:55,
+
+origin:{x:1}
+
+});
+
+if(Date.now()<fim){
+
+requestAnimationFrame(frame);
+
+}
+
+})();
+
+}
+
+</script>
+
+</body>
+</html>

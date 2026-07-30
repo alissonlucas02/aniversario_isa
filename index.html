@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Caixa Misteriosa</title>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    height:100vh;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:radial-gradient(circle at center,#1b2735,#090a0f 80%);
+}
+
+/* ESTRELAS */
+
+.stars{
+    position:absolute;
+    inset:0;
+}
+
+.star{
+    position:absolute;
+    background:white;
+    border-radius:50%;
+    animation:piscar 2s infinite alternate;
+}
+
+@keyframes piscar{
+    from{opacity:.2;}
+    to{opacity:1;}
+}
+
+/* TEXTO */
+
+.info{
+
+    position:absolute;
+    top:60px;
+
+    color:white;
+
+    text-align:center;
+
+    width:100%;
+}
+
+.info h1{
+
+    font-size:42px;
+
+}
+
+.info p{
+
+    margin-top:15px;
+
+    color:#ddd;
+
+    font-size:20px;
+
+}
+
+/* PRESENTE */
+
+.present{
+
+    position:relative;
+
+    width:220px;
+
+    height:220px;
+
+    cursor:pointer;
+
+    transition:.5s;
+
+    animation:flutuar 2.5s ease-in-out infinite;
+
+}
+
+@keyframes flutuar{
+
+0%,100%{
+
+transform:translateY(0);
+
+}
+
+50%{
+
+transform:translateY(-15px);
+
+}
+
+}
+
+.present:hover{
+
+transform:scale(1.08);
+
+}
+
+/* TAMPA */
+
+.lid{
+
+position:absolute;
+
+top:0;
+
+width:220px;
+
+height:60px;
+
+background:#d62828;
+
+border-radius:10px;
+
+z-index:3;
+
+transition:.8s;
+
+}
+
+/* CAIXA */
+
+.box{
+
+position:absolute;
+
+bottom:0;
+
+width:220px;
+
+height:170px;
+
+background:#ff4d4d;
+
+border-radius:0 0 12px 12px;
+
+}
+
+/* FITA */
+
+.ribbon-v{
+
+position:absolute;
+
+left:98px;
+
+width:24px;
+
+height:220px;
+
+background:gold;
+
+z-index:4;
+
+}
+
+.ribbon-h{
+
+position:absolute;
+
+top:18px;
+
+width:220px;
+
+height:24px;
+
+background:gold;
+
+z-index:4;
+
+}
+
+/* LAÇO */
+
+.bow{
+
+position:absolute;
+
+top:-18px;
+
+left:78px;
+
+width:65px;
+
+height:40px;
+
+z-index:5;
+
+}
+
+.bow:before,.bow:after{
+
+content:"";
+
+position:absolute;
+
+width:32px;
+
+height:32px;
+
+border:8px solid gold;
+
+border-radius:50% 50% 0 50%;
+
+}
+
+.bow:before{
+
+left:0;
+
+transform:rotate(-45deg);
+
+}
+
+.bow:after{
+
+right:0;
+
+transform:rotate(135deg);
+
+}
+
+/* BRILHO */
+
+.glow{
+
+position:absolute;
+
+width:280px;
+
+height:280px;
+
+background:radial-gradient(rgba(255,255,180,.45),transparent 70%);
+
+border-radius:50%;
+
+left:-30px;
+
+top:-30px;
+
+animation:glow 2s infinite;
+
+}
+
+@keyframes glow{
+
+0%,100%{opacity:.4;}
+
+50%{opacity:1;}
+
+}
+
+/* ABRIR */
+
+.open .lid{
+
+transform:translateY(-120px) rotate(-18deg);
+
+}
+
+.open{
+
+animation:shake .5s linear;
+
+}
+
+@keyframes shake{
+
+0%{transform:translateX(-5px);}
+
+25%{transform:translateX(5px);}
+
+50%{transform:translateX(-5px);}
+
+75%{transform:translateX(5px);}
+
+100%{transform:translateX(0);}
+
+}
+
+/* FLASH */
+
+.flash{
+
+position:fixed;
+
+inset:0;
+
+background:white;
+
+opacity:0;
+
+pointer-events:none;
+
+transition:.6s;
+
+}
+
+.flash.show{
+
+opacity:1;
+
+}
+
+@media(max-width:600px){
+
+.info h1{
+
+font-size:30px;
+
+}
+
+.info p{
+
+font-size:17px;
+
+padding:0 20px;
+
+}
+
+.present{
+
+transform:scale(.8);
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="flash" id="flash"></div>
+
+<div class="info">
+
+<h1>🎁 Caixa Misteriosa</h1>
+
+<p>Clique na caixa e descubra a surpresa...</p>
+
+</div>
+
+<div class="present" id="gift">
+
+<div class="glow"></div>
+
+<div class="lid"></div>
+
+<div class="box"></div>
+
+<div class="ribbon-v"></div>
+
+<div class="ribbon-h"></div>
+
+<div class="bow"></div>
+
+</div>
+
+<script>
+
+/* ESTRELAS */
+
+const estrelas=document.getElementById("stars");
+
+for(let i=0;i<220;i++){
+
+const s=document.createElement("div");
+
+s.className="star";
+
+const t=Math.random()*3+1;
+
+s.style.width=t+"px";
+
+s.style.height=t+"px";
+
+s.style.left=Math.random()*100+"%";
+
+s.style.top=Math.random()*100+"%";
+
+s.style.animationDelay=Math.random()*3+"s";
+
+estrelas.appendChild(s);
+
+}
+
+/* ABRIR PRESENTE */
+
+const gift=document.getElementById("gift");
+
+gift.onclick=function(){
+
+gift.classList.add("open");
+
+/* explosão */
+
+confetti({
+particleCount:300,
+spread:180,
+origin:{y:.6}
+});
+
+setTimeout(()=>{
+
+confetti({
+particleCount:400,
+spread:360,
+startVelocity:60
+});
+
+},300);
+
+/* flash */
+
+setTimeout(()=>{
+
+document.getElementById("flash").classList.add("show");
+
+},700);
+
+/* redireciona */
+
+setTimeout(()=>{
+
+window.location.href="aniversario.html";
+
+/* troque pelo nome da sua outra página */
+
+},1800);
+
+};
+
+</script>
+
+</body>
+</html>
